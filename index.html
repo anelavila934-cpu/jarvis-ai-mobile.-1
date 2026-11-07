@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0913">
+<meta name="description" content="JARVIS AI - asistente personal móvil">
+<link rel="manifest" href="manifest.webmanifest">
+<title>JARVIS AI</title>
+<style>
+:root{--bg:#0b0913;--panel:#171326;--purple:#a879ff;--cyan:#6ce7f2;--text:#f5f0ff;--muted:#a69bb9}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 0%,#25163f 0%,var(--bg) 54%);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.app{max-width:650px;margin:auto;min-height:100dvh;display:flex;flex-direction:column;padding:22px 16px calc(16px + env(safe-area-inset-bottom))}
+header{text-align:center;padding:12px 0 18px}.brand{font-size:26px;letter-spacing:.22em;font-weight:750}.sub{font-size:10px;letter-spacing:.2em;color:var(--purple);margin-top:5px}
+.orb{width:132px;height:132px;margin:16px auto 12px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#34215c 0%,#17112a 54%,#0b0913 72%);border:1px solid #9e75ff88;box-shadow:0 0 35px #8b5cf655,inset 0 0 25px #8b5cf633;position:relative}
+.orb:before,.orb:after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px solid #8f6be866;animation:pulse 3s infinite}
+.orb:after{inset:-17px;opacity:.45;animation-delay:1s}.orb span{font-size:47px;color:var(--cyan);text-shadow:0 0 22px #6ce7f2}
+@keyframes pulse{50%{transform:scale(1.07);opacity:.25}}
+.status{font-size:11px;color:var(--cyan);letter-spacing:.14em}
+.chat{flex:1;min-height:180px;max-height:48vh;overflow:auto;background:#171326bb;border:1px solid #ffffff12;border-radius:18px;padding:13px;margin:10px 0}
+.msg{padding:11px 13px;border-radius:14px;margin:8px 0;line-height:1.45;font-size:14px;white-space:pre-wrap}
+.bot{background:#29203c;border:1px solid #a879ff25}.user{background:#34205a;margin-left:22px}
+.tag{font-size:9px;letter-spacing:.15em;color:var(--purple);font-weight:700;margin-bottom:4px}
+.controls{display:flex;gap:8px}.controls input{min-width:0;flex:1;background:#1b1729;border:1px solid #ffffff20;border-radius:24px;padding:14px;color:white;font-size:15px;outline:none}
+button{border:0;border-radius:22px;background:linear-gradient(135deg,#9d70f6,#6542b7);color:white;font-size:17px;min-width:48px;padding:0 15px;font-weight:700}
+button:active{transform:scale(.97)}.hint{text-align:center;color:var(--muted);font-size:10px;padding:12px 4px}
+footer{display:flex;justify-content:space-between;color:#776d89;font-size:10px;padding:7px 3px}
+</style>
+</head>
+<body><main class="app">
+<header>
+ <div class="brand">J.A.R.V.I.S</div><div class="sub">PERSONAL AI SYSTEM · MOBILE</div>
+ <div class="orb"><span>◉</span></div><div class="status" id="status">● SISTEMA EN LÍNEA</div>
+</header>
+<section class="chat" id="chat" aria-live="polite">
+ <div class="msg bot"><div class="tag">JARVIS</div>Buenos días. La interfaz está lista. Puedes escribirme o usar el micrófono para dictar. Esta versión funciona en modo demostración local.</div>
+</section>
+<form class="controls" id="form">
+ <input id="prompt" autocomplete="off" placeholder="Escribe un mensaje..." aria-label="Mensaje">
+ <button type="button" id="mic" aria-label="Dictar">🎙</button><button type="submit" aria-label="Enviar">➤</button>
+</form>
+<div class="hint">VERSIÓN 0.1 · MODO LOCAL · IA EN LA NUBE AÚN NO CONECTADA</div>
+<footer><span>JARVIS MOBILE</span><span>SECURE SESSION</span></footer>
+</main>
+<script>
+const chat=document.querySelector('#chat'),input=document.querySelector('#prompt'),statusEl=document.querySelector('#status');
+function add(who,text){const d=document.createElement('div');d.className='msg '+(who==='TÚ'?'user':'bot');const t=document.createElement('div');t.className='tag';t.textContent=who;const b=document.createElement('div');b.textContent=text;d.append(t,b);chat.append(d);chat.scrollTop=chat.scrollHeight;}
+function reply(s){const q=s.toLowerCase();if(/hola|buenas/.test(q))return'Hola. JARVIS está en línea. ¿En qué puedo ayudarte?';if(/quién eres|quien eres/.test(q))return'Soy JARVIS, tu asistente personal en desarrollo.';if(/ayuda/.test(q))return'Puedes escribirme o tocar el micrófono para dictar. Esta versión todavía no está conectada a una IA externa.';if(/hora/.test(q))return'La hora de tu dispositivo es '+new Date().toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})+'.';return'He recibido tu mensaje. La interfaz y el dictado están preparados. Para responder con inteligencia artificial real, el siguiente paso es conectar un servidor seguro.';}
+function speak(s){if('speechSynthesis'in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s);u.lang='es-PA';speechSynthesis.speak(u);}}
+document.querySelector('#form').addEventListener('submit',e=>{e.preventDefault();const s=input.value.trim();if(!s)return;input.value='';add('TÚ',s);const a=reply(s);add('JARVIS',a);speak(a);});
+document.querySelector('#mic').addEventListener('click',()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){statusEl.textContent='● DICTADO NO DISPONIBLE EN ESTE NAVEGADOR';return;}const r=new SR();r.lang='es-PA';r.interimResults=false;r.onstart=()=>statusEl.textContent='● ESCUCHANDO';r.onend=()=>statusEl.textContent='● SISTEMA EN LÍNEA';r.onerror=()=>statusEl.textContent='● NO SE PUDO USAR EL MICRÓFONO';r.onresult=e=>{input.value=e.results[0][0].transcript;document.querySelector('#form').requestSubmit();};r.start();});
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>

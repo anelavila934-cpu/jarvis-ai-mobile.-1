@@ -1,0 +1,4 @@
+{
+ "name":"JARVIS AI Mobile","short_name":"JARVIS","start_url":"./","display":"standalone",
+ "background_color":"#0b0913","theme_color":"#0b0913","description":"Asistente personal móvil"
+}
